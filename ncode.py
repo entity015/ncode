@@ -32,8 +32,8 @@ def run(content):
 			filter(file_dir,file_ext)
 		merge(code)
 		print(f" Saved {code}.pdf")
-	except:
-		pass
+	except Exception as e:
+		print(e)
 
 def dloads(path,url):
 	image = requests.get(url,headers=header,timeout=7)
