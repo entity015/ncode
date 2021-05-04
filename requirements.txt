@@ -1,0 +1,5 @@
+filetype
+requests
+imagesize
+FPDF
+bs4
