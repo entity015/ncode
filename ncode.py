@@ -79,14 +79,14 @@ def main():
 			file = input("List: ")
 			line = open(file).read().splitlines()
 			args = []
-			threads = []
 			[args.append(x) for x in line if x]
 			a = 0
 			b = 3
 			count = len(args)
 			while count > 0:
+				threads = []
 				for i in range(a,b):
-					t = threading.Thread(target=soup,args=(args[i]))
+					t = threading.Thread(target=soup,args=(args[i],))
 					threads.append(t)
 				for t in threads:
 					t.start()
