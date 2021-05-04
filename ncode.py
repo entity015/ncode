@@ -4,10 +4,10 @@ import os
 import sys
 import filetype
 import requests
+import threading
 import imagesize
 from fpdf import FPDF
 from bs4 import BeautifulSoup
-from multiprocessing.dummy import Pool
 
 def soup(code):
 	u = f"https://nhentai.net/g/{code}"
@@ -79,9 +79,26 @@ def main():
 			file = input("List: ")
 			line = open(file).read().splitlines()
 			args = []
+			threads = []
 			[args.append(x) for x in line if x]
-			with Pool(3) as pool:
-				pool.map(soup,args)
+			a = 0
+			b = 3
+			count = len(args)
+			while count > 0:
+				for i in range(a,b):
+					t = threading.Thread(target=soup,args=(args[i]))
+					threads.append(t)
+				for t in threads:
+					t.start()
+				for t in threads:
+					t.join()
+				count-=3
+				if count < 3:
+					a+=3
+					b+=count
+				else:
+					a+=3
+					b+=3
 		elif i == "0":
 			exit("Exit.")
 		else: exit("Wrong input.")
