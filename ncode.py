@@ -15,24 +15,25 @@ def soup(code):
 	run(BeautifulSoup(r.content,'html.parser'))
 
 def run(content):
-	code = content.find("h3",id="gallery_id").text.replace("#","")
-	os.mkdir(code)
-	mangatitle = content.find(property='og:title')['content']
-	gallery_id = content.find(property='og:image')['content'].split('/')[4]
-	file_links = content.find_all('div',class_='thumb-container')
-	file_count = len(file_links)
+	try:
+		code = content.find(id="gallery_id").find(text=True,recursive=False)
+		os.mkdir(code)
+		gallery_id = content.find(property='og:image')['content'].split('/')[4]
+		file_links = content.find_all('div',class_='thumb-container')
+		file_count = len(file_links)
 
-	print (f" ({code}) -> {mangatitle.strip()} ({file_count} Pages)")
-
-	for index,value in enumerate(file_links,1):
-		file_lnk = value.find_all('img')[1]['src']
-		file_ext = file_lnk.split('.')[-1]
-		file_url = f"https://i.nhentai.net/galleries/{gallery_id}/{index}.{file_ext}"
-		file_dir = f"{code}/{str(index).zfill(len(str(file_count)))}.{file_ext}"
-		dloads(file_dir,file_url)
-		filter(file_dir,file_ext)
-	merge(code)
-	print(f" Saved {code}.pdf")
+		for index,value in enumerate(file_links,1):
+			file_lnk = value.find_all('img')[1]['src']
+			file_ext = file_lnk.split('.')[-1]
+			file_url = f"https://i.nhentai.net/galleries/{gallery_id}/{index}.{file_ext}"
+			file_dir = f"{code}/{str(index).zfill(len(str(file_count)))}.{file_ext}"
+			sys.stdout.write(" [%s] Downloading [%s/%s] ...\n" % (code,index,file_count))
+			dloads(file_dir,file_url)
+			filter(file_dir,file_ext)
+		merge(code)
+		print(f" Saved {code}.pdf")
+	except:
+		pass
 
 def dloads(path,url):
 	image = requests.get(url,headers=header,timeout=7)
@@ -67,7 +68,6 @@ def merge(code):
 	file_pdf.output(file_out,"F")
 
 def main():
-	try:
 		os.system("clear" if os.name=="posix" else "cls")
 		print(banner)
 		i = input("−−$ ")
@@ -77,8 +77,10 @@ def main():
 		elif i == "2":
 			file = input("List: ")
 			line = open(file).read().splitlines()
-			with Pool(len(line)) as pool:
-				pool.map(soup,line)
+			args = []
+			[args.append(x) for x in line if x]
+			with Pool(3) as pool:
+				pool.map(soup,args)
 		elif i == "0":
 			exit("Exit.")
 		else: exit("Wrong input.")
