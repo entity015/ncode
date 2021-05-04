@@ -68,6 +68,7 @@ def merge(code):
 	file_pdf.output(file_out,"F")
 
 def main():
+	try:
 		os.system("clear" if os.name=="posix" else "cls")
 		print(banner)
 		i = input("−−$ ")
